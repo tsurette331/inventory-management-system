@@ -80,14 +80,6 @@ Product: Test Kit A | Qty: 10 | Supplier: BioLab Inc
 
 ---
 
-## UI Prototype
-
-View Figma Prototype (ADD LINK)
-
-Simple interface showing how users interact with the system.
-
----
-
 ## How to Run
 
 ```bash
