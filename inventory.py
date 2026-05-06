@@ -5,12 +5,12 @@ def view_inventory():
     cursor.execute("SELECT * FROM Inventory;")
     rows = cursor.fetchall()
     
-    #for row in rows:
-        #print(f"Product: {row[1]} | Qty: {row[2]}")
+    for row in rows:
+        print(f"Product: {row[1]} | Qty: {row[2]}")
 
 def low_stock_items():
     cursor.execute("""
-        SELECT item_name, quantity, reorder_point
+        SELECT product_name, quantity, reorder_point
         FROM Inventory
         WHERE quantity <= reorder_point
         """)
@@ -21,7 +21,7 @@ def low_stock_items():
 
 def inventory_with_suppliers():
     cursor.execute("""
-        SELECT i.item_name, i.quantity, s.supplier_name
+        SELECT i.product_name, i.quantity, s.supplier_name
         FROM Inventory i
         JOIN Supplier s ON i.supplier_id = s.supplier_id;
     """)
@@ -34,9 +34,9 @@ def inventory_with_suppliers():
 def search_by_product():
     keyword = input("Search inventory by product: ")
     cursor.execute("""
-        SELECT item_name, quantity, reorder_point
+        SELECT product_name, quantity, reorder_point
         FROM Inventory
-        WHERE item_name LIKE ?
+        WHERE product_name LIKE ?
         """, ("%" + keyword + "%",))
 
     rows = cursor.fetchall()
@@ -127,7 +127,7 @@ def add_product():
     
     cursor.execute("""
     INSERT INTO Inventory 
-    (item_name, quantity, reorder_point, supplier_id, location_id, status)
+    (product_name, quantity, reorder_point, supplier_id, location_id, status)
     VALUES ( ?, ?, ?, ?, ?, ?)
     """, (new_product, new_qty, new_ro, supplier_id, location_id, status))
 
@@ -152,7 +152,7 @@ def delete_product():
     deleted_product = get_non_empty("Enter the product name to be deleted: ")
 
     cursor.execute("""
-        SELECT * FROM Inventory WHERE item_name = ?
+        SELECT * FROM Inventory WHERE product_name = ?
     """, (deleted_product,))
 
     if cursor.fetchone() is None:
@@ -167,7 +167,7 @@ def delete_product():
 
     cursor.execute("""
     DELETE FROM Inventory
-    WHERE item_name = ?
+    WHERE product_name = ?
     """, (deleted_product,))
 
     conn.commit()
@@ -181,7 +181,7 @@ def update_qty():
     cursor.execute("""
         SELECT reorder_point 
         FROM Inventory 
-        WHERE item_name = ?
+        WHERE product_name = ?
     """, (product_name,))
 
     result = cursor.fetchone()
@@ -193,14 +193,14 @@ def update_qty():
     reorder_point = result[0]
     
     if new_qty <= reorder_point:
-        status = "low stock"
+        status = "Low Stock"
     else:
-        status = "in stock"
+        status = "In Stock"
     
     cursor.execute("""
     UPDATE Inventory
     SET quantity = ?, status = ?
-    WHERE item_name = ?
+    WHERE product_name = ?
     """, (new_qty, status, product_name))
 
     conn.commit()
